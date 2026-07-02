@@ -1,2 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+python-jose
+passlib[bcrypt]
 python-dotenv
 pydantic-settings
+scikit-learn
+numpy
