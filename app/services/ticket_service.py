@@ -1,13 +1,8 @@
 from sqlalchemy.orm import Session
+
 from app.models.ticket import Ticket
 from app.services.ml_service import classify_ticket
 from app.services.ai_logic import generate_resolution
-from app.services.ai_logic import generate_resolution
-
-from app.services.email_service import (
-    send_support_email,
-    send_customer_email,
-)
 
 
 def detect_priority(title: str, description: str):
@@ -45,6 +40,7 @@ def create_ticket(
     customer_contact: str = "website customer",
 ):
     category = classify_ticket(title, description)
+
     ai_suggested_resolution = generate_resolution(
         category,
         title,
@@ -69,11 +65,6 @@ def create_ticket(
     db.add(ticket)
     db.commit()
     db.refresh(ticket)
-
-    try:
-        send_support_email(ticket)
-    except Exception as e:
-        print(f"Failed to send email: {e}")
 
     return ticket
 
@@ -116,18 +107,10 @@ def respond_to_ticket(
         return None
 
     ticket.agent_response = response
-
     ticket.resolution = response
-
     ticket.status = "resolved"
 
     db.commit()
     db.refresh(ticket)
-
-    try:
-        send_customer_email(ticket)
-    except Exception as e:
-        print(f"Failed to send customer email: {e}")
-
 
     return ticket
